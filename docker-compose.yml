@@ -5,9 +5,9 @@
       container_name: 'unisoft'
       restart :  always
       volumes: 
-        - .:/uzb
+        - .:/soft
       ports:
-        - "8800:8800"
+        - "8765:8765"
       env_file:
         - ./.env 
-      command: sh -c "python manage.py runserver 0.0.0.0:8741"
+      command: sh -c "python manage.py runserver 0.0.0.0:8765"

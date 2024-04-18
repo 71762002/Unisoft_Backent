@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN pip install --upgrade pip
 
-COPY . /uzb
-WORKDIR /uzb
+COPY . /soft
+WORKDIR /soft
 
 RUN pip install -r requirements.txt
