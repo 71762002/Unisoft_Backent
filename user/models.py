@@ -35,6 +35,11 @@ class User(AbstractBaseUser,  PermissionsMixin, DefaultAbstract):
     email = models.EmailField(max_length=200, unique=True)
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
+    user_type = models.SmallIntegerField(choices=[
+        (1, "Admin"),
+        (2, "SuperAdmin"),
+        (3, "Operator"),
+    ], default=1)
     is_staff = models.BooleanField('Staff', default=False)
     is_active = models.BooleanField('Active', default=True)
     is_superuser = models.BooleanField(default=True)

@@ -7,7 +7,7 @@ services:
     volumes: 
       - .:/uzb
     ports:
-      - "8081:8081"
+      - "8877:8877"
     env_file:
       - ./.env 
-    command: sh -c "python manage.py runserver 0.0.0.0:8003"
+    command: sh -c "python manage.py runserver 0.0.0.0:8877"
