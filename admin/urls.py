@@ -46,7 +46,6 @@ schema_view = drf_yasg_views.get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
-    path('home/', include('home.urls')),
     path('api-auth/', include('rest_framework.urls')), 
    
 

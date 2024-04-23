@@ -51,8 +51,6 @@ def user_login(request, *args, **kwargs):
             'error' : "User not found"
         }, status=HTTP_400_BAD_REQUEST)
     user_tokens = user.tokens()
-
-
     return Response({
         "status" : True,
         "email": email,
