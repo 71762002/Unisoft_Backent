@@ -5,25 +5,29 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
-
+from rest_framework import permissions, status, generics
+from rest_framework.authentication import SessionAuthentication
 from django.contrib.auth import logout
-from rest_framework.permissions import IsAdminUser, BasePermission, SAFE_METHODS, IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
-
-from user.serializer import UserLoginSerializer, UserRegisterSerializer
-
+from user.serializer import *
 from .models import User
 
-class UserWritePermission(BasePermission):
-    message = 'Adding customers not allowed.'
+
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, IsAuthenticatedOrReadOnly, BasePermission, IsAdminUser, DjangoModelPermissions
+
+
+class SupportUserWritePermission(BasePermission):
+    message = 'Xabarlarni tahrirlash faqat muallifga tegishli!'
 
     def has_object_permission(self, request, view, obj):
+
         if request.method in SAFE_METHODS:
             return True
-        return obj.author == request.user
+
+        return obj.user == request.user
+    
 
 @swagger_auto_schema(method="POST", tags=['user'], request_body=UserRegisterSerializer)
 @api_view(['POST'])
-# @permission_classes([DjangoModelPermissionsOrAnonReadOnly])
 def registratsiya(request, *args, **kwargs):
     serializer = UserRegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)   
@@ -33,11 +37,6 @@ def registratsiya(request, *args, **kwargs):
         "data" : serializer.data,
         
     })  
-def get_queryset(self):
-        if self.request.user.is_superuser:
-            return User.objects.all()
-        else:
-            return User.objects.filter(id=self.request.user.id)
 
 
 @swagger_auto_schema(method="POST", tags=['user'], request_body=UserLoginSerializer)
@@ -63,10 +62,36 @@ def user_login(request, *args, **kwargs):
     })
   
 
+@swagger_auto_schema(method="GET", tags=['user'], query_serializer=UserSerializer)
+@api_view(["GET"])
+def get_user(request, *args, **kwargs):
+    if not request.user.is_authenticated:                                     # Foydalanuvchi tizimga kirganligini tekshirish
+        return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    role = request.user.role               # Foydalanuvchi rolini olish
+    queryset = User.objects.all()
+    if role == 'manager':
+        queryset = queryset.filter(role='manager')
+    elif role == 'operator':
+        queryset = queryset.filter(id=request.user.id)
+    serializer = UserSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+
+# def get_queryset(self):
+#         if self.request.user.is_superuser:
+#             return User.objects.all()
+#         else:
+#             return User.objects.filter(id=self.request.user.id)
+
     
 
 class UserLagout(APIView):
-    def post(request):
+    def post(self, request):
         logout(request)
-        return redirect("login")
+        return Response(status=HTTP_200_OK)
     
+
+
+
